@@ -1,82 +1,77 @@
 /**
  * @author Peterphobia
  */
-//make sure html is pulling jscripts
-console.log("javascript working");
 
-//create dataLoaded function with unemployment
+//Using previous template to pull json data
+//from unemployment doc, 
+//create a program that will pull the numbers
+//from a fusion table:
+
+//1. Open Scripts and HTML from last week
+//2. Create Fusion Table from Unemployment Data
+//3. Insert Fusion Table URL into Get function
+//4. Comment out loop function, to disable
+//5. Log console, to show that fusion data
+// is displayed in console
+//6. Use google fusion template to create new table
+//7. Create line graph from table
+
+
+//make sure html is pulling scripts from fusion table
+//console.log("javascript working");
+
+//create function with unemployment
 //data under local name "Unemployment"
-//sub-catagorized into an array of relevant information
-function jsonLoaded(unemployment) {
+
+function mjsonLoaded(unemployment) {
 	//Log Unemployment numbers to demonstrate jsonloaded is working
 	console.log(unemployment);
-
-	//Create arry of arrays to isolate dates and values from
-	//unemployment data observations.
-	//Loop "observations" from unemployment to sort dates and values
-	//into "sortedData" then push to "displayData" to build chart
-	//from
-
-	// First make "observations" its own object.
-
-	var observations = (unemployment.observations);
 	// Create Array to hold data, starting with "date" and "value"
 	// headers
 
-	var displayDataHeader = ["date", "value"];
-	var displayData = [displayDataHeader];
+	var displayDataHeader = unemployment.columns;
+	console.log(displayDataHeader);
+	
+	//insert data table template from fusion tables
+	//replace default data with unemployment.rows data
+	
+	var mtable = new google.visualization.DataTable();
+	mtable.addColumn('string', displayDataHeader[0]);
+	mtable.addColumn('number', displayDataHeader[1]);
+	mtable.addRows(unemployment.rows);
+	
+	//add title
+	var chartOptions = {
+		
+		title: "Post-war Unemployment"
+	};
 
-	//Use a loop to populate "selectedData" with dates and value from
-	//each observation in "unemployment."
-
-	//begin for loop with starting point, ending point and
-	//increment of observations to be counted
-	for (var i = 0; i < observations.length; i++) {
-		// define loopedObs as "i" of observations
-
-		var loopedObs = observations[i];
-
-		//arrange sorted dates and values from observations
-		// into a new array called "sortedData"
-		//convert "values" from strings to numbers
-		var sortedData = [loopedObs.date, Number(loopedObs.value)];
-
-		// send sortedData to displayData
-
-		displayData.push(sortedData);
-	}//End of loop
-
-	// Log data from "displayData" to show function is working
-	console.log(displayData);
-
-	//Create a data table from "displayData"
-	var unmpDataTable = google.visualization.arrayToDataTable(displayData);
+	
+	//Create a table to add data from "table"
+	//var munmpDataTable = google.visualization.arrayToDataTable(mtable);
 
 
 	// Draw the linegraph in html div "graph div"
 
-	var unmpGraph = new google.visualization.LineChart(document.getElementById("UnmpGraphDiv"));
-	unmpGraph.draw(unmpDataTable)
+	var munmpGraph = new google.visualization.LineChart(document.getElementById("munmpGraphDiv"));
+	munmpGraph.draw(mtable)
 
-	var options = {
-			title: "Unemployment Since 1980"
-	};
-
+	
 
 }//end of jsonLoaded function
 
 //build googleLoaded function
 //with Unemployment file imported
 
-function chartLoaded() {
+function mchartLoaded() {
 	//Console log to show that googleLoaded is working
 	console.log("Google Loaded");
 
 	//Import Unemployment json file
-	$.get("UEMP270V_data.json", jsonLoaded, "json");
+	$.get("https://www.googleapis.com/fusiontables/v1/query?sql=SELECT+*+FROM+1-MVrEbZ5fxoEIEBU9_CDM4iUVLK8cqU1T067n3ly&key=AIzaSyALhD6XEx_Ge1QTHvfmlwy5e_9_p--vouY", mjsonLoaded, "json");
 }//end chartLoaded function
 
-function pageLoaded() {
+function mpageLoaded() {
 
 	//indicate page has loaded
 	console.log("Page Loaded!");
@@ -84,7 +79,7 @@ function pageLoaded() {
 	//Load chart from google and init. google loaded function
 	google.load("visualization", "1", {
 		packages : ["corechart"],
-		callback : "chartLoaded"
+		callback : "mchartLoaded"
 
 
 	});
@@ -95,4 +90,4 @@ function pageLoaded() {
 
 
 // pageLoaded function
-$(document).ready(pageLoaded);
+$(document).ready(mpageLoaded);
